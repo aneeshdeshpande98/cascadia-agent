@@ -815,7 +815,8 @@ TOOLS = [
             "Fetch live public National Weather Service forecast and active weather alerts for a known "
             "Cascades or Mt. Hood location. Use this when the user asks for current weather, wants "
             "a real public-data check, or is planning around timing, wind, precipitation, heat, or alerts. "
-            "This is real public NWS data, not mocked data."
+            "This is real public NWS data, not mocked data. Results include source_urls; cite the relevant "
+            "NWS links in the final answer using Markdown links."
         ),
         "input_schema": {
             "type": "object",

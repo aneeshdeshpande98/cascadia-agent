@@ -57,9 +57,57 @@ function renderText(container, text) {
 
   for (const paragraph of paragraphs) {
     const p = document.createElement("p");
-    p.textContent = paragraph;
+    appendInlineContent(p, paragraph);
     container.append(p);
   }
+}
+
+function appendInlineContent(element, text) {
+  const lines = text.split("\n");
+  lines.forEach((line, index) => {
+    if (index > 0) {
+      element.append(document.createElement("br"));
+    }
+    appendInlineLine(element, line);
+  });
+}
+
+function appendInlineLine(element, text) {
+  const pattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|(https?:\/\/[^\s<)]+)/g;
+  let cursor = 0;
+  let match;
+
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > cursor) {
+      element.append(document.createTextNode(text.slice(cursor, match.index)));
+    }
+
+    const label = match[1] || match[3];
+    const url = match[2] || trimTrailingPunctuation(match[3]);
+    const trailing = match[3] ? match[3].slice(url.length) : "";
+    element.append(createSafeLink(label, url));
+    if (trailing) {
+      element.append(document.createTextNode(trailing));
+    }
+    cursor = pattern.lastIndex;
+  }
+
+  if (cursor < text.length) {
+    element.append(document.createTextNode(text.slice(cursor)));
+  }
+}
+
+function trimTrailingPunctuation(url) {
+  return url.replace(/[.,;:!?]+$/, "");
+}
+
+function createSafeLink(label, url) {
+  const anchor = document.createElement("a");
+  anchor.textContent = label;
+  anchor.href = url;
+  anchor.target = "_blank";
+  anchor.rel = "noopener noreferrer";
+  return anchor;
 }
 
 function scrollToBottom() {

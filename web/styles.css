@@ -251,6 +251,17 @@ svg {
   margin-bottom: 0;
 }
 
+.bubble a {
+  color: var(--accent);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.bubble a:hover {
+  color: var(--accent-strong);
+}
+
 .bubble.error {
   border-color: rgba(191, 76, 54, 0.5);
   background: #fff1ec;
