@@ -22,6 +22,13 @@ All 5 mock tools implemented with realistic Cascades-flavored data:
 - `Agent.chat(user_input)` maintains multi-turn conversation history
 - Uses `claude-sonnet-4-6`
 
+### `public_data.py`
+- Live public-data integration with the National Weather Service API
+- Resolves known Cascades and Mt. Hood locations to coordinates
+- Fetches NWS point metadata, daily forecast, hourly forecast, and active alerts
+- Uses a small in-memory cache and explicit User-Agent header
+- Returns structured errors when a location is unknown or the public API is unreachable
+
 ### `main.py`
 - Load `.env` for `ANTHROPIC_API_KEY`
 - Print welcome line
@@ -56,7 +63,10 @@ ANTHROPIC_API_KEY=your_key_here
 Add focused tests for `tools.py`, unknown route handling, and the web API.
 
 ### Tool traces
-Expose tool calls in the UI so the project reads as an agent with inspectable behavior, not just a chat wrapper.
+Expose tool calls in the UI so the project reads as an agent with inspectable behavior, not just a chat wrapper. This should make the new live NWS public-data calls visible to users.
+
+### More public data
+Add another real connector, likely Recreation.gov/RIDB for public recreation facilities or USGS water data for rivers and gauges.
 
 ### Evals (later)
 Per the spec: 8–12 scenario fixtures, an eval runner, LLM-as-judge grading, and a `REPORT.md`. Build after the core agent is working and verified.

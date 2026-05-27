@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from typing import Any
 
+from public_data import get_nws_forecast
+
 
 # ---------------------------------------------------------------------------
 # Mock data
@@ -769,6 +771,7 @@ def escalate_to_human_guide(reason: str, conversation_summary: str) -> dict[str,
 def dispatch(tool_name: str, tool_input: dict) -> Any:
     handlers = {
         "get_avalanche_forecast": lambda i: get_avalanche_forecast(i["zone"]),
+        "get_nws_forecast": lambda i: get_nws_forecast(i["location"]),
         "get_mountain_weather": lambda i: get_mountain_weather(i["location"], i["days_out"]),
         "get_route_info": lambda i: get_route_info(i["route_name"]),
         "lookup_recent_observations": lambda i: lookup_recent_observations(i["zone"], i["days_back"]),
@@ -804,6 +807,29 @@ TOOLS = [
                 }
             },
             "required": ["zone"],
+        },
+    },
+    {
+        "name": "get_nws_forecast",
+        "description": (
+            "Fetch live public National Weather Service forecast and active weather alerts for a known "
+            "Cascades or Mt. Hood location. Use this when the user asks for current weather, wants "
+            "a real public-data check, or is planning around timing, wind, precipitation, heat, or alerts. "
+            "This is real public NWS data, not mocked data."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "location": {
+                    "type": "string",
+                    "description": (
+                        "Known location such as 'paradise', 'camp muir', 'mt. rainier', "
+                        "'timberline lodge', 'mt. hood', 'mt. baker', 'snoqualmie pass', "
+                        "'stevens pass', 'crystal mountain', or 'artist point'."
+                    ),
+                }
+            },
+            "required": ["location"],
         },
     },
     {

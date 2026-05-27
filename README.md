@@ -2,7 +2,7 @@
 
 Cascadia Agent is a portfolio backcountry ski planning agent for the Washington Cascades and Mt. Hood. It is designed as a coach: it gathers conditions, builds a picture of the party, and asks users to articulate their own decision instead of giving a binary go/no-go answer.
 
-The project currently has both a CLI and a browser chat interface. The external data tools are mocked with realistic Cascades-flavored avalanche forecasts, mountain weather, route information, recent observations, and a simulated human-guide escalation.
+The project currently has both a CLI and a browser chat interface. Most external data tools are mocked with realistic Cascades-flavored avalanche forecasts, mountain weather, route information, recent observations, and a simulated human-guide escalation. The first real public-data integration uses the National Weather Service API for live forecasts and active alerts.
 
 ## How It Works
 
@@ -11,7 +11,7 @@ Browser UI or CLI
   -> Agent.chat()
   -> Anthropic Messages API
   -> Claude may request tools
-  -> tools.py dispatches mocked condition/route data
+  -> tools.py dispatches mocked condition/route data or live public NWS data
   -> Claude synthesizes a coaching response
 ```
 
@@ -19,6 +19,7 @@ Key files:
 
 - `agent.py` contains the system prompt, Claude client, conversation memory, and tool-use loop.
 - `tools.py` contains mocked forecast, weather, route, observation, and escalation tools plus Claude tool schemas.
+- `public_data.py` contains live public-data clients, starting with the National Weather Service API.
 - `main.py` runs the terminal chat loop.
 - `web.py` runs the local browser UI server.
 - `web/` contains the static chat interface.
@@ -87,6 +88,7 @@ git status --short
 
 - Add tests for `tools.py` and the web API.
 - Add visible tool-call traces in the UI so users can see when the agent fetched route, avalanche, weather, or observation data.
+- Add more public-data connectors, such as Recreation.gov/RIDB or USGS water data.
 - Add scenario-based evals for coaching behavior, route hallucination, escalation, and emergency handling.
 - Add GitHub Actions to run tests on every push.
 
