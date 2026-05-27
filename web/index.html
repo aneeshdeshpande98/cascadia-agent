@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cascadia Agent</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Trip context">
+        <div>
+          <p class="eyebrow">Cascadia Agent</p>
+          <h1>Backcountry ski planning, with a coach in the loop.</h1>
+          <p class="lede">Washington Cascades and Mt. Hood. Mock NWAC-style forecasts, route info, weather, and observations.</p>
+        </div>
+
+        <section class="quick-start" aria-label="Example prompts">
+          <h2>Try a scenario</h2>
+          <button class="prompt-chip" type="button">We are thinking Coleman-Deming this weekend. Party of three, AIARE 1, comfortable on glaciers.</button>
+          <button class="prompt-chip" type="button">Two of us want to ski Hood South Side tomorrow. We have crampons and one prior volcano day.</button>
+          <button class="prompt-chip" type="button">How should we think about Liberty Ridge if the forecast says wind slab on north aspects?</button>
+        </section>
+
+        <div class="status-panel">
+          <div>
+            <span class="status-dot" aria-hidden="true"></span>
+            <span>Coach mode</span>
+          </div>
+          <button id="resetButton" class="icon-button" type="button" title="Start a new conversation" aria-label="Start a new conversation">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+              <path d="M21 3v6h-6"/>
+            </svg>
+          </button>
+        </div>
+      </aside>
+
+      <main class="chat-panel" aria-label="Chat">
+        <div id="messages" class="messages" aria-live="polite">
+          <article class="message agent-message">
+            <div class="avatar" aria-hidden="true">CA</div>
+            <div class="bubble">
+              <p>What are you thinking about getting after?</p>
+            </div>
+          </article>
+        </div>
+
+        <form id="chatForm" class="composer">
+          <label class="sr-only" for="messageInput">Message</label>
+          <textarea id="messageInput" rows="1" placeholder="Describe the objective, party, timing, or conditions..." autocomplete="off"></textarea>
+          <button id="sendButton" class="send-button" type="submit" aria-label="Send message">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m22 2-7 20-4-9-9-4Z"/>
+              <path d="M22 2 11 13"/>
+            </svg>
+          </button>
+        </form>
+      </main>
+    </div>
+
+    <script src="/script.js"></script>
+  </body>
+</html>

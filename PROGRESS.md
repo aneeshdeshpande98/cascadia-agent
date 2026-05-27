@@ -2,7 +2,7 @@
 
 ## What this is
 
-A CLI backcountry ski planning agent for the Washington Cascades (and Mt. Hood). The agent acts as a Coach: it pulls avalanche forecasts, weather, route data, and recent field observations, then helps the user articulate their own decision — not make it for them. Built with the Anthropic Python SDK using Claude tool use.
+A backcountry ski planning agent for the Washington Cascades (and Mt. Hood). The agent acts as a Coach: it pulls avalanche forecasts, weather, route data, and recent field observations, then helps the user articulate their own decision — not make it for them. Built with the Anthropic Python SDK using Claude tool use.
 
 ## Done
 
@@ -22,14 +22,18 @@ All 5 mock tools implemented with realistic Cascades-flavored data:
 - `Agent.chat(user_input)` maintains multi-turn conversation history
 - Uses `claude-sonnet-4-6`
 
-## Left to do
-
 ### `main.py`
-Simple CLI entry point:
 - Load `.env` for `ANTHROPIC_API_KEY`
 - Print welcome line
 - `while True` input loop → `agent.chat()` → print response
 - Handle Ctrl+C and empty input
+
+### `web.py` and `web/`
+- Local stdlib HTTP server for a browser chat interface
+- `POST /api/chat` sends user messages to the existing `Agent`
+- `POST /api/reset` starts a fresh conversation for the browser session
+- Static HTML/CSS/JS interface with example prompts, responsive layout, typing state, and reset control
+- Per-browser-session agent state using a cookie-backed session id
 
 ### `requirements.txt`
 ```
@@ -42,8 +46,17 @@ python-dotenv
 ANTHROPIC_API_KEY=your_key_here
 ```
 
-### Test it end-to-end
-Run `python main.py` and walk through a real planning conversation to verify the agent calls tools, synthesizes correctly, and probes party experience.
+### GitHub hygiene
+- `.gitignore` excludes local secrets, bytecode, virtualenvs, and common generated files
+- `README.md` explains setup, architecture, run commands, and first GitHub push workflow
+
+## Left to do
+
+### Tests
+Add focused tests for `tools.py`, unknown route handling, and the web API.
+
+### Tool traces
+Expose tool calls in the UI so the project reads as an agent with inspectable behavior, not just a chat wrapper.
 
 ### Evals (later)
 Per the spec: 8–12 scenario fixtures, an eval runner, LLM-as-judge grading, and a `REPORT.md`. Build after the core agent is working and verified.
