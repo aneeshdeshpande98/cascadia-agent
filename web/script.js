@@ -73,7 +73,7 @@ function appendInlineContent(element, text) {
 }
 
 function appendInlineLine(element, text) {
-  const pattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|(https?:\/\/[^\s<)]+)/g;
+  const pattern = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)|(https?:\/\/[^\s<>)]+)/g;
   let cursor = 0;
   let match;
 

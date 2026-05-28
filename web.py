@@ -53,6 +53,12 @@ class ChatHandler(SimpleHTTPRequestHandler):
             return
         self.send_error(HTTPStatus.NOT_FOUND, "Unknown endpoint")
 
+    def end_headers(self) -> None:
+        path = urlparse(self.path).path
+        if path.endswith((".html", ".css", ".js")) or path in {"/", "/index.html"}:
+            self.send_header("Cache-Control", "no-store")
+        super().end_headers()
+
     def log_message(self, format: str, *args) -> None:
         print(f"{self.address_string()} - {format % args}")
 
