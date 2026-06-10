@@ -39,6 +39,9 @@ class ChatHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
+        if parsed.path == "/api/config":
+            self._handle_config()
+            return
         if parsed.path == "/":
             self.path = "/index.html"
         return super().do_GET()
@@ -74,7 +77,7 @@ class ChatHandler(SimpleHTTPRequestHandler):
 
         try:
             with chat_session.lock:
-                reply = chat_session.agent.chat(message)
+                turn = chat_session.agent.chat_with_trace(message)
         except Exception as exc:
             self._send_json(
                 {"error": "The agent hit an error while answering.", "detail": str(exc)},
@@ -83,13 +86,24 @@ class ChatHandler(SimpleHTTPRequestHandler):
             )
             return
 
-        self._send_json({"reply": reply}, session_id=session_id if is_new else None)
+        self._send_json(turn, session_id=session_id if is_new else None)
 
     def _handle_reset(self) -> None:
         session_id, is_new = self._session_id()
         with sessions_lock:
             sessions[session_id] = ChatSession()
         self._send_json({"ok": True}, session_id=session_id if is_new else None)
+
+    def _handle_config(self) -> None:
+        posthog_key = os.getenv("POSTHOG_PROJECT_KEY", "").strip()
+        posthog_host = os.getenv("POSTHOG_HOST", "https://us.i.posthog.com").strip()
+        self._send_json({
+            "posthog": {
+                "enabled": bool(posthog_key),
+                "project_key": posthog_key,
+                "host": posthog_host,
+            }
+        })
 
     def _read_json(self) -> dict:
         content_length = int(self.headers.get("Content-Length", "0"))

@@ -65,6 +65,27 @@ http://127.0.0.1:8000
 
 The browser UI keeps a separate agent session per browser cookie and includes a reset button to start a fresh conversation.
 
+## Optional PostHog Analytics
+
+Set these environment variables in `.env` to test PostHog locally:
+
+```bash
+POSTHOG_PROJECT_KEY=phc_your_project_key
+POSTHOG_HOST=https://us.i.posthog.com
+```
+
+When configured, the browser UI loads PostHog and captures product events such as:
+
+- `app_loaded`
+- `chat_message_sent`
+- `agent_reply_received`
+- `chat_error`
+- `conversation_reset`
+- `example_prompt_selected`
+- `trace_opened`
+
+The app does not send raw chat text to PostHog by default. It sends metadata such as message length, response time, trace count, and tool names.
+
 ## GitHub Workflow
 
 This project is local until you connect it to GitHub. A normal first push looks like:

@@ -7,6 +7,12 @@ const promptButtons = document.querySelectorAll(".prompt-chip");
 
 let isSending = false;
 
+function track(eventName, properties = {}) {
+  if (window.cascadiaAnalytics) {
+    window.cascadiaAnalytics.capture(eventName, properties);
+  }
+}
+
 function addMessage(role, text, options = {}) {
   const article = document.createElement("article");
   article.className = `message ${role === "user" ? "user-message" : "agent-message"}`;
@@ -21,6 +27,9 @@ function addMessage(role, text, options = {}) {
   renderText(bubble, text);
 
   article.append(avatar, bubble);
+  if (role === "agent" && Array.isArray(options.traces) && options.traces.length > 0) {
+    article.append(renderTracePanel(options.traces));
+  }
   messages.append(article);
   scrollToBottom();
   return article;
@@ -110,6 +119,71 @@ function createSafeLink(label, url) {
   return anchor;
 }
 
+function renderTracePanel(traces) {
+  const panel = document.createElement("div");
+  panel.className = "trace-panel";
+
+  const title = document.createElement("div");
+  title.className = "trace-title";
+  title.textContent = "Agent actions";
+  panel.append(title);
+
+  traces.forEach((trace) => {
+    const item = document.createElement("details");
+    item.className = `trace-item trace-${trace.status || "ok"}`;
+    item.addEventListener("toggle", () => {
+      if (item.open) {
+        track("trace_opened", {
+          tool_name: trace.name || "unknown",
+          status: trace.status || "ok",
+          source_count: Array.isArray(trace.sources) ? trace.sources.length : 0,
+        });
+      }
+    });
+
+    const summary = document.createElement("summary");
+    const name = document.createElement("span");
+    name.className = "trace-name";
+    name.textContent = trace.label || trace.name || "Tool call";
+    const result = document.createElement("span");
+    result.className = "trace-result";
+    result.textContent = trace.summary || "";
+    summary.append(name, result);
+    item.append(summary);
+
+    const meta = document.createElement("div");
+    meta.className = "trace-meta";
+    meta.append(renderTraceInput(trace.input || {}));
+    if (Array.isArray(trace.sources) && trace.sources.length > 0) {
+      meta.append(renderTraceSources(trace.sources));
+    }
+    item.append(meta);
+    panel.append(item);
+  });
+
+  return panel;
+}
+
+function renderTraceInput(input) {
+  const inputLine = document.createElement("div");
+  inputLine.className = "trace-input";
+  inputLine.textContent = `Input: ${JSON.stringify(input)}`;
+  return inputLine;
+}
+
+function renderTraceSources(sources) {
+  const sourceLine = document.createElement("div");
+  sourceLine.className = "trace-sources";
+  sourceLine.append(document.createTextNode("Sources: "));
+  sources.forEach((source, index) => {
+    if (index > 0) {
+      sourceLine.append(document.createTextNode(" · "));
+    }
+    sourceLine.append(createSafeLink(source.label || "source", source.url));
+  });
+  return sourceLine;
+}
+
 function scrollToBottom() {
   messages.scrollTop = messages.scrollHeight;
 }
@@ -124,7 +198,11 @@ async function sendMessage(text) {
   if (!message || isSending) return;
 
   isSending = true;
+  const startedAt = performance.now();
   sendButton.disabled = true;
+  track("chat_message_sent", {
+    message_length: message.length,
+  });
   addMessage("user", message);
   input.value = "";
   autosizeInput();
@@ -141,13 +219,26 @@ async function sendMessage(text) {
 
     if (!response.ok) {
       addMessage("agent", data.detail || data.error || "Something went wrong.", { error: true });
+      track("chat_error", {
+        status: response.status,
+        has_detail: Boolean(data.detail),
+      });
       return;
     }
 
-    addMessage("agent", data.reply);
+    addMessage("agent", data.reply, { traces: data.traces });
+    track("agent_reply_received", {
+      duration_ms: Math.round(performance.now() - startedAt),
+      reply_length: data.reply ? data.reply.length : 0,
+      trace_count: Array.isArray(data.traces) ? data.traces.length : 0,
+      tool_names: Array.isArray(data.traces) ? data.traces.map((trace) => trace.name) : [],
+    });
   } catch (error) {
     typing.remove();
     addMessage("agent", "I could not reach the local chat server. Is `python web.py` still running?", { error: true });
+    track("chat_network_error", {
+      message: error instanceof Error ? error.message : "unknown",
+    });
   } finally {
     isSending = false;
     sendButton.disabled = false;
@@ -174,6 +265,7 @@ resetButton.addEventListener("click", async () => {
   await fetch("/api/reset", { method: "POST" });
   messages.innerHTML = "";
   addMessage("agent", "Fresh start. What are you thinking about getting after?");
+  track("conversation_reset");
   input.focus();
 });
 
@@ -181,6 +273,9 @@ promptButtons.forEach((button) => {
   button.addEventListener("click", () => {
     input.value = button.textContent.trim();
     autosizeInput();
+    track("example_prompt_selected", {
+      prompt_length: input.value.length,
+    });
     input.focus();
   });
 });

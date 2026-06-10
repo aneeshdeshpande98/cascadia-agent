@@ -262,6 +262,79 @@ svg {
   color: var(--accent-strong);
 }
 
+.trace-panel {
+  grid-column: 2;
+  display: grid;
+  gap: 8px;
+  width: min(100%, 720px);
+  margin-top: -8px;
+}
+
+.trace-title {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.trace-item {
+  border: 1px solid #c8d7d4;
+  border-radius: 8px;
+  background: rgba(230, 242, 239, 0.62);
+  overflow: hidden;
+}
+
+.trace-item summary {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.35fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.trace-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.trace-name {
+  color: var(--accent-strong);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.trace-result {
+  color: #41524e;
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.trace-meta {
+  display: grid;
+  gap: 7px;
+  padding: 0 12px 12px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.trace-input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.trace-sources a {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.trace-error {
+  border-color: rgba(191, 76, 54, 0.45);
+  background: #fff1ec;
+}
+
 .bubble.error {
   border-color: rgba(191, 76, 54, 0.5);
   background: #fff1ec;
@@ -420,6 +493,16 @@ textarea:focus {
   .bubble {
     padding: 12px 13px;
     font-size: 0.95rem;
+  }
+
+  .trace-panel {
+    grid-column: 2;
+    width: 100%;
+  }
+
+  .trace-item summary {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 
   .composer {
